@@ -38,16 +38,33 @@ button{width:100%;height:52px;border:none;border-radius:16px;background:linear-g
 .doc-title{font-size:14px;font-weight:900;color:#fff;margin-bottom:6px;display:flex;align-items:center;gap:6px}
 .doc-title span{color:red}
 .doc-help{font-size:11px;color:#aaa;line-height:1.35;margin-bottom:9px}
-input[type="file"]{height:auto;padding:12px;background:#111;border:1px dashed #e60000;color:#ddd}
-input[type="file"]::file-selector-button{border:none;border-radius:10px;background:#e60000;color:#fff;font-weight:900;padding:9px 10px;margin-right:8px}
-.preview-foto{display:none;margin-top:9px;width:100%;max-height:190px;object-fit:cover;border-radius:13px;border:1px solid #333;background:#060606}
-.status-foto{display:none;margin-top:8px;font-size:12px;color:#00d65b;font-weight:800}
 
 @media(max-width:380px){
   .area{padding:18px 15px 24px}
   h1{font-size:20px}
   button{font-size:16px}
 }
+
+input[type="file"]{display:none}
+.doc-box{border:1px solid #292929;background:linear-gradient(180deg,#080808,#030303);border-radius:18px;padding:14px;margin:14px 0}
+.doc-title{font-size:16px;font-weight:900;margin-bottom:7px}.doc-title span{color:red}.doc-help{font-size:13px;color:#aaa;line-height:1.35;margin-bottom:12px}
+.btn-foto{height:50px;border-radius:14px;background:linear-gradient(90deg,#ff0000,#d80000);box-shadow:0 0 14px rgba(255,0,0,.25);font-size:16px}
+.preview-foto{display:none;margin-top:10px;width:100%;max-height:230px;object-fit:contain;border-radius:13px;border:1px solid #333;background:#060606}
+.status-foto{display:none;margin-top:8px;font-size:12px;color:#00d65b;font-weight:800}
+.camera-modal{display:none;position:fixed;inset:0;background:#000;z-index:9999;align-items:center;justify-content:center;flex-direction:column;padding:14px}
+.camera-top{width:100%;max-width:520px;display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;color:#fff;font-weight:900}
+.camera-close{width:42px;height:42px;border-radius:50%;background:#1b1b1b;color:#fff;border:1px solid #333;font-size:24px;box-shadow:none}
+.camera-area{position:relative;width:100%;max-width:520px;background:#111;border-radius:18px;overflow:hidden;border:1px solid #333}
+#cameraVideo,#cameraCanvas,#cameraPreview{width:100%;height:min(70vh,640px);object-fit:cover;display:block;background:#000}
+#cameraCanvas,#cameraPreview{display:none}
+.guia-doc{position:absolute;left:8%;right:8%;top:18%;height:58%;border:3px solid #00d66b;border-radius:10px;box-shadow:0 0 0 999px rgba(0,0,0,.32);pointer-events:none}
+.guia-doc:before,.guia-doc:after{content:"";position:absolute;width:34px;height:34px;border-color:#00ff77}
+.guia-doc:before{left:-5px;top:-5px;border-left:6px solid #00ff77;border-top:6px solid #00ff77}
+.guia-doc:after{right:-5px;bottom:-5px;border-right:6px solid #00ff77;border-bottom:6px solid #00ff77}
+.guia-selfie{position:absolute;left:18%;right:18%;top:12%;height:62%;border:3px solid #00d66b;border-radius:50%;box-shadow:0 0 0 999px rgba(0,0,0,.25);pointer-events:none}
+.camera-instrucao{width:100%;max-width:520px;color:#ddd;text-align:center;font-size:13px;margin:10px 0 12px;line-height:1.35}
+.camera-actions{width:100%;max-width:520px;display:flex;gap:10px}.camera-actions button{height:52px}.btn-secundario{display:none;background:#111;border:1px solid #ff3350;color:#ff8a99;box-shadow:none}.btn-confirmar{display:none;background:linear-gradient(90deg,#00c767,#00a850);box-shadow:0 0 18px rgba(0,214,91,.25)}
+
 </style>
 </head>
 <body>
@@ -85,37 +102,36 @@ input[type="file"]::file-selector-button{border:none;border-radius:10px;backgrou
     <label>Endereço completo <span>*</span></label>
     <input id="endereco" required placeholder="Digite seu endereço completo">
 
-
     <div class="doc-box">
       <div class="doc-title">📸 Foto do rosto <span>*</span></div>
-      <div class="doc-help">Tire uma selfie na hora. No celular, abre a câmera frontal quando permitido.</div>
-      <input id="fotoRosto" type="file" accept="image/*" capture="user" required>
+      <div class="doc-help">Tire uma selfie na hora. Abre a câmera frontal.</div>
+      <button type="button" class="btn-foto" onclick="abrirCamera('fotoRosto','user','Foto do rosto')">Tirar Foto</button>
       <img id="prevRosto" class="preview-foto" alt="Prévia da foto do rosto">
-      <div id="okRosto" class="status-foto">✅ Foto do rosto adicionada</div>
+      <div id="okRosto" class="status-foto">✅ Foto do rosto tirada</div>
     </div>
 
     <div class="doc-box">
       <div class="doc-title">🪪 RG frente <span>*</span></div>
-      <div class="doc-help">Tire a foto da frente do RG na hora. Use a câmera traseira.</div>
-      <input id="rgFrente" type="file" accept="image/*" capture="environment" required>
+      <div class="doc-help">Aproxime o RG dentro do quadrado verde e tire a foto completa e legível.</div>
+      <button type="button" class="btn-foto" onclick="abrirCamera('rgFrente','environment','RG frente')">Tirar Foto</button>
       <img id="prevRgFrente" class="preview-foto" alt="Prévia RG frente">
-      <div id="okRgFrente" class="status-foto">✅ RG frente adicionado</div>
+      <div id="okRgFrente" class="status-foto">✅ RG frente tirado</div>
     </div>
 
     <div class="doc-box">
       <div class="doc-title">🪪 RG verso <span>*</span></div>
-      <div class="doc-help">Tire a foto do verso do RG na hora. Use a câmera traseira.</div>
-      <input id="rgVerso" type="file" accept="image/*" capture="environment" required>
+      <div class="doc-help">Aproxime o verso do RG dentro do quadrado verde e tire a foto completa.</div>
+      <button type="button" class="btn-foto" onclick="abrirCamera('rgVerso','environment','RG verso')">Tirar Foto</button>
       <img id="prevRgVerso" class="preview-foto" alt="Prévia RG verso">
-      <div id="okRgVerso" class="status-foto">✅ RG verso adicionado</div>
+      <div id="okRgVerso" class="status-foto">✅ RG verso tirado</div>
     </div>
 
     <div class="doc-box">
       <div class="doc-title">🏠 Comprovante de endereço <span>*</span></div>
-      <div class="doc-help">Tire a foto do comprovante na hora. Use a câmera traseira.</div>
-      <input id="fotoComprovante" type="file" accept="image/*" capture="environment" required>
+      <div class="doc-help">Aproxime o comprovante dentro do quadrado verde e tire a foto completa.</div>
+      <button type="button" class="btn-foto" onclick="abrirCamera('fotoComprovante','environment','Comprovante de endereço')">Tirar Foto</button>
       <img id="prevComprovante" class="preview-foto" alt="Prévia comprovante de endereço">
-      <div id="okComprovante" class="status-foto">✅ Comprovante adicionado</div>
+      <div id="okComprovante" class="status-foto">✅ Comprovante tirado</div>
     </div>
 
     <label>Valor desejado <span>*</span></label>
@@ -157,6 +173,26 @@ input[type="file"]::file-selector-button{border:none;border-radius:10px;backgrou
   <p class="dev">DESENVOLVIDO POR NICOLAS</p>
 </div>
 
+
+<div id="cameraModal" class="camera-modal">
+  <div class="camera-top">
+    <span id="cameraTitulo">Tirar foto</span>
+    <button type="button" class="camera-close" onclick="fecharCamera()">×</button>
+  </div>
+  <div class="camera-area">
+    <video id="cameraVideo" autoplay playsinline></video>
+    <canvas id="cameraCanvas"></canvas>
+    <img id="cameraPreview" alt="Prévia da foto">
+    <div id="cameraGuia" class="guia-doc"></div>
+  </div>
+  <div id="cameraInstrucao" class="camera-instrucao">Aproxime o documento dentro do quadrado verde.</div>
+  <div class="camera-actions">
+    <button type="button" id="btnTirar" onclick="tirarFotoCamera()">TIRAR FOTO</button>
+    <button type="button" id="btnOutra" class="btn-secundario" onclick="tirarOutraFoto()">TIRAR OUTRA</button>
+    <button type="button" id="btnGostei" class="btn-confirmar" onclick="confirmarFoto()">GOSTEI</button>
+  </div>
+</div>
+
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getDatabase, ref, push, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
@@ -178,34 +214,101 @@ const db = getDatabase(app);
 const JUROS = 0.30;
 const WHATSAPP = "5515998486563";
 
-function configurarFoto(inputId, previewId, statusId){
-  const input = document.getElementById(inputId);
-  const preview = document.getElementById(previewId);
-  const status = document.getElementById(statusId);
-  input.addEventListener('change', function(){
-    const file = this.files && this.files[0];
-    if(!file){
-      preview.style.display = 'none';
-      status.style.display = 'none';
-      return;
-    }
-    if(!file.type.startsWith('image/')){
-      alert('Envie somente foto/imagem.');
-      this.value = '';
-      preview.style.display = 'none';
-      status.style.display = 'none';
-      return;
-    }
-    preview.src = URL.createObjectURL(file);
-    preview.style.display = 'block';
-    status.style.display = 'block';
-  });
+
+const fotosCapturadas = {};
+let streamAtual = null;
+let fotoAtual = null;
+let facingAtual = 'environment';
+let tituloAtual = '';
+let tempFoto = null;
+
+const idsPreview = {
+  fotoRosto: ['prevRosto','okRosto'],
+  rgFrente: ['prevRgFrente','okRgFrente'],
+  rgVerso: ['prevRgVerso','okRgVerso'],
+  fotoComprovante: ['prevComprovante','okComprovante']
+};
+
+async function abrirCamera(tipo, facing, titulo){
+  fotoAtual = tipo;
+  facingAtual = facing;
+  tituloAtual = titulo;
+  tempFoto = null;
+  document.getElementById('cameraTitulo').textContent = titulo;
+  document.getElementById('cameraInstrucao').textContent = tipo === 'fotoRosto' ? 'Centralize seu rosto dentro do círculo e tire a selfie.' : 'Aproxime o documento dentro do quadrado verde. Deixe completo e legível.';
+  document.getElementById('cameraGuia').className = tipo === 'fotoRosto' ? 'guia-selfie' : 'guia-doc';
+  document.getElementById('cameraModal').style.display = 'flex';
+  document.getElementById('cameraVideo').style.display = 'block';
+  document.getElementById('cameraPreview').style.display = 'none';
+  document.getElementById('cameraGuia').style.display = 'block';
+  document.getElementById('btnTirar').style.display = 'flex';
+  document.getElementById('btnOutra').style.display = 'none';
+  document.getElementById('btnGostei').style.display = 'none';
+  try{
+    if(streamAtual) streamAtual.getTracks().forEach(t=>t.stop());
+    streamAtual = await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:facing}}, audio:false});
+    document.getElementById('cameraVideo').srcObject = streamAtual;
+  }catch(e){
+    alert('Não foi possível abrir a câmera. Permita o acesso à câmera no navegador.');
+    fecharCamera();
+  }
 }
 
-configurarFoto('fotoRosto','prevRosto','okRosto');
-configurarFoto('rgFrente','prevRgFrente','okRgFrente');
-configurarFoto('rgVerso','prevRgVerso','okRgVerso');
-configurarFoto('fotoComprovante','prevComprovante','okComprovante');
+function tirarFotoCamera(){
+  const video = document.getElementById('cameraVideo');
+  const canvas = document.getElementById('cameraCanvas');
+  const preview = document.getElementById('cameraPreview');
+  canvas.width = video.videoWidth || 1280;
+  canvas.height = video.videoHeight || 720;
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+  tempFoto = canvas.toDataURL('image/jpeg', 0.88);
+  preview.src = tempFoto;
+  video.style.display = 'none';
+  preview.style.display = 'block';
+  document.getElementById('cameraGuia').style.display = 'none';
+  document.getElementById('btnTirar').style.display = 'none';
+  document.getElementById('btnOutra').style.display = 'flex';
+  document.getElementById('btnGostei').style.display = 'flex';
+}
+
+function tirarOutraFoto(){
+  tempFoto = null;
+  document.getElementById('cameraVideo').style.display = 'block';
+  document.getElementById('cameraPreview').style.display = 'none';
+  document.getElementById('cameraGuia').style.display = 'block';
+  document.getElementById('btnTirar').style.display = 'flex';
+  document.getElementById('btnOutra').style.display = 'none';
+  document.getElementById('btnGostei').style.display = 'none';
+}
+
+function confirmarFoto(){
+  if(!tempFoto || !fotoAtual) return;
+  fotosCapturadas[fotoAtual] = tempFoto;
+  const [prevId, okId] = idsPreview[fotoAtual];
+  const prev = document.getElementById(prevId);
+  const ok = document.getElementById(okId);
+  prev.src = tempFoto;
+  prev.style.display = 'block';
+  ok.style.display = 'block';
+  const btn = prev.parentElement.querySelector('.btn-foto');
+  if(btn) btn.textContent = 'Tirar Outra Foto';
+  fecharCamera();
+}
+
+function fecharCamera(){
+  document.getElementById('cameraModal').style.display = 'none';
+  if(streamAtual){
+    streamAtual.getTracks().forEach(t=>t.stop());
+    streamAtual = null;
+  }
+}
+
+window.abrirCamera = abrirCamera;
+window.tirarFotoCamera = tirarFotoCamera;
+window.tirarOutraFoto = tirarOutraFoto;
+window.confirmarFoto = confirmarFoto;
+window.fecharCamera = fecharCamera;
 
 
 const cpfInput = document.getElementById('cpf');
@@ -249,10 +352,10 @@ document.getElementById('form').addEventListener('submit', async function(e){
   const telefone = document.getElementById('telefone').value.trim();
   const endereco = document.getElementById('endereco').value.trim();
   const valorNumero = Number(document.getElementById('valor').value);
-  const fotoRosto = document.getElementById('fotoRosto').files[0];
-  const rgFrente = document.getElementById('rgFrente').files[0];
-  const rgVerso = document.getElementById('rgVerso').files[0];
-  const fotoComprovante = document.getElementById('fotoComprovante').files[0];
+  const fotoRosto = fotosCapturadas.fotoRosto;
+  const rgFrente = fotosCapturadas.rgFrente;
+  const rgVerso = fotosCapturadas.rgVerso;
+  const fotoComprovante = fotosCapturadas.fotoComprovante;
 
   if(!nome || !cpf || !telefone || !endereco || !valorNumero){
     alert('Preencha todos os dados obrigatórios.');
@@ -285,10 +388,10 @@ document.getElementById('form').addEventListener('submit', async function(e){
     jurosNumero: juros,
     total: dinheiro(total),
     totalNumero: total,
-    fotoRosto: fotoRosto.name,
-    rgFrente: rgFrente.name,
-    rgVerso: rgVerso.name,
-    comprovanteEndereco: fotoComprovante.name,
+    fotoRosto: 'capturada',
+    rgFrente: 'capturada',
+    rgVerso: 'capturada',
+    comprovanteEndereco: 'capturado',
     data: new Date().toLocaleString('pt-BR'),
     criadoEm: serverTimestamp()
   };
@@ -310,7 +413,6 @@ Endereço: ${endereco}
 Valor solicitado: ${dados.valor}
 Juros 30%: ${dados.juros}
 Valor total: ${dados.total}
-Fotos obrigatórias tiradas: rosto, RG frente, RG verso e comprovante de endereço.
 Data: ${dados.data}`;
 
     aviso.style.display='block';
