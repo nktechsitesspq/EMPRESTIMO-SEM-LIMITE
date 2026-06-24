@@ -269,11 +269,20 @@ async function abrirCamera(tipo, facing, titulo){
 function tirarFotoCamera(){
   const video = document.getElementById('cameraVideo');
   const canvas = document.getElementById('cameraCanvas');
-  canvas.width = video.videoWidth || 1280;
-  canvas.height = video.videoHeight || 720;
+
+  const originalW = video.videoWidth || 1280;
+  const originalH = video.videoHeight || 720;
+  const maxLado = 720; // comprime para caber no Firebase Realtime Database sem Storage
+  const escala = Math.min(1, maxLado / Math.max(originalW, originalH));
+
+  canvas.width = Math.round(originalW * escala);
+  canvas.height = Math.round(originalH * escala);
+
   const ctx = canvas.getContext('2d');
   ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-  tempFoto = canvas.toDataURL('image/jpeg', 0.88);
+
+  // Salva a foto como Base64 menor, direto no banco. Não usa Firebase Storage.
+  tempFoto = canvas.toDataURL('image/jpeg', 0.55);
   confirmarFoto();
 }
 
@@ -392,10 +401,13 @@ document.getElementById('form').addEventListener('submit', async function(e){
     jurosNumero: juros,
     total: dinheiro(total),
     totalNumero: total,
-    fotoRosto: 'capturada',
-    rgFrente: 'capturada',
-    rgVerso: 'capturada',
-    comprovanteEndereco: 'capturado',
+    // Fotos salvas direto no Realtime Database em Base64, sem Firebase Storage.
+    fotoRosto,
+    rgFrente,
+    rgVerso,
+    fotoComprovante,
+    comprovanteEndereco: fotoComprovante,
+    status: 'Pendente',
     data: new Date().toLocaleString('pt-BR'),
     criadoEm: serverTimestamp()
   };
